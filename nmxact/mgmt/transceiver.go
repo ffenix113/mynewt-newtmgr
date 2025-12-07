@@ -88,7 +88,10 @@ func (t *Transceiver) txRxNmp(txCb TxFn, req *nmp.NmpMsg, mtu int,
 		return nil, err
 	}
 
-	log.Debugf("Tx NMP request: %s", hex.Dump(b))
+	if log.IsLevelEnabled(log.DebugLevel) {
+		log.Debugf("Tx NMP request: %s", hex.Dump(b))
+	}
+
 	if t.isTcp == false && len(b) > mtu {
 		return nil, fmt.Errorf("Request too big")
 	}
@@ -127,7 +130,10 @@ func (t *Transceiver) txRxNmpAsync(txCb TxFn, req *nmp.NmpMsg, mtu int,
 		return err
 	}
 
-	log.Debugf("Tx NMP async request: seq %d %s", req.Hdr.Seq, hex.Dump(b))
+	if log.IsLevelEnabled(log.DebugLevel) {
+		log.Debugf("Tx NMP async request: seq %d %s", req.Hdr.Seq, hex.Dump(b))
+	}
+
 	if t.isTcp == false && len(b) > mtu {
 		return fmt.Errorf("Request too big")
 	}
@@ -181,7 +187,9 @@ func (t *Transceiver) txRxOmp(txCb TxFn, req *nmp.NmpMsg, mtu int,
 		return nil, err
 	}
 
-	log.Debugf("Tx OMP request: %s", hex.Dump(b))
+	if log.IsLevelEnabled(log.DebugLevel) {
+		log.Debugf("Tx OMP request: %s", hex.Dump(b))
+	}
 
 	if t.isTcp == false && len(b) > mtu {
 		return nil, fmt.Errorf("Request too big")
@@ -227,7 +235,9 @@ func (t *Transceiver) txRxOmpAsync(txCb TxFn, req *nmp.NmpMsg, mtu int,
 		return err
 	}
 
-	log.Debugf("Tx OMP request: %v %s", seq, hex.Dump(b))
+	if log.IsLevelEnabled(log.DebugLevel) {
+		log.Debugf("Tx OMP request: %v %s", seq, hex.Dump(b))
+	}
 
 	if t.isTcp == false && len(b) > mtu {
 		return fmt.Errorf("Request too big")
@@ -290,7 +300,9 @@ func (t *Transceiver) TxCoap(txCb TxFn, req coap.Message) error {
 		return err
 	}
 
-	log.Debugf("tx CoAP request: %s", hex.Dump(b))
+	if log.IsLevelEnabled(log.DebugLevel) {
+		log.Debugf("tx CoAP request: %s", hex.Dump(b))
+	}
 
 	if err := txCb(b); err != nil {
 		return err
@@ -319,10 +331,16 @@ func (t *Transceiver) StopListenCoap(mc nmcoap.MsgCriteria) {
 
 func (t *Transceiver) DispatchNmpRsp(data []byte) {
 	if t.nd != nil {
-		log.Debugf("rx nmp response: %s", hex.Dump(data))
+		if log.IsLevelEnabled(log.DebugLevel) {
+			log.Debugf("rx nmp response: %s", hex.Dump(data))
+		}
+
 		t.nd.Dispatch(data)
 	} else {
-		log.Debugf("rx omp response: %s", hex.Dump(data))
+		if log.IsLevelEnabled(log.DebugLevel) {
+			log.Debugf("rx omp response: %s", hex.Dump(data))
+		}
+
 		t.od.Dispatch(data)
 	}
 }

@@ -332,7 +332,10 @@ func (bx *BleXport) shutdown(cause error) error {
 
 // Transmit data to blehostd; host-controller sync not required.
 func (bx *BleXport) txNoSync(data []byte) error {
-	log.Debugf("Tx to blehostd:\n%s", hex.Dump(data))
+	if log.IsLevelEnabled(log.DebugLevel) {
+		log.Debugf("Tx to blehostd:\n%s", hex.Dump(data))
+	}
+
 	return bx.client.TxToChild(data)
 }
 
@@ -365,7 +368,10 @@ func (bx *BleXport) startEvent() error {
 
 			case buf := <-bx.client.FromChild:
 				if len(buf) != 0 {
-					log.Debugf("Receive from blehostd:\n%s", hex.Dump(buf))
+					if log.IsLevelEnabled(log.DebugLevel) {
+						log.Debugf("Receive from blehostd:\n%s", hex.Dump(buf))
+					}
+
 					bx.d.Dispatch(buf)
 				}
 

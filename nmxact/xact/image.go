@@ -497,20 +497,21 @@ func (c *ImageUpgradeCmd) runUpload(s sesn.Sesn) (*ImageUploadResult, error) {
 		c.ProgressCb(uc, r)
 	}
 
-	for {
-		var opt = sesn.TxOptions{
-			Timeout: c.CmdBase.txOptions.Timeout,
-			Tries:   1,
-		}
-		cmd := NewImageUploadCmd()
-		cmd.Data = c.Data
-		cmd.StartOff = startOff
-		cmd.Upgrade = c.Upgrade
-		cmd.ProgressCb = progressCb
-		cmd.ImageNum = c.ImageNum
-		cmd.SetTxOptions(opt)
-		cmd.MaxWinSz = c.MaxWinSz
+	var opt = sesn.TxOptions{
+		Timeout: c.txOptions.Timeout,
+		Tries:   1,
+	}
 
+	cmd := NewImageUploadCmd()
+	cmd.Data = c.Data
+	cmd.Upgrade = c.Upgrade
+	cmd.ProgressCb = progressCb
+	cmd.ImageNum = c.ImageNum
+	cmd.SetTxOptions(opt)
+	cmd.MaxWinSz = c.MaxWinSz
+
+	for {
+		cmd.StartOff = startOff
 		res, err := cmd.Run(s)
 		if err == nil {
 			return res.(*ImageUploadResult), nil

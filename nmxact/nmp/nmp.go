@@ -102,34 +102,32 @@ func DecodeNmpHdr(data []byte) (*NmpHdr, error) {
 	return hdr, nil
 }
 
-func (hdr *NmpHdr) Bytes() []byte {
-	buf := make([]byte, 0, NMP_HDR_SIZE)
+func (hdr *NmpHdr) Bytes() [NMP_HDR_SIZE]byte {
+	var buf [NMP_HDR_SIZE]byte
 
-	buf = append(buf, byte(hdr.Op))
-	buf = append(buf, byte(hdr.Flags))
+	buf[0] = hdr.Op
+	buf[1] = hdr.Flags
 
-	u16b := make([]byte, 2)
-	binary.BigEndian.PutUint16(u16b, hdr.Len)
-	buf = append(buf, u16b...)
+	binary.BigEndian.PutUint16(buf[2:], hdr.Len)
+	binary.BigEndian.PutUint16(buf[4:], hdr.Group)
 
-	binary.BigEndian.PutUint16(u16b, hdr.Group)
-	buf = append(buf, u16b...)
-
-	buf = append(buf, byte(hdr.Seq))
-	buf = append(buf, byte(hdr.Id))
+	buf[6] = hdr.Seq
+	buf[7] = hdr.Id
 
 	return buf
 }
 
 func BodyBytes(body interface{}) ([]byte, error) {
-	data := make([]byte, 0)
+	data := make([]byte, 0, 64)
 
 	enc := codec.NewEncoderBytes(&data, new(codec.CborHandle))
 	if err := enc.Encode(body); err != nil {
 		return nil, fmt.Errorf("Failed to encode message %s", err.Error())
 	}
 
-	log.Debugf("Encoded %+v to:\n%s", body, hex.Dump(data))
+	if log.IsLevelEnabled(log.DebugLevel) {
+		log.Debugf("Encoded %+v to:\n%s", body, hex.Dump(data))
+	}
 
 	return data, nil
 }
@@ -143,9 +141,11 @@ func EncodeNmpPlain(nmr *NmpMsg) ([]byte, error) {
 	nmr.Hdr.Len = uint16(len(bb))
 
 	hb := nmr.Hdr.Bytes()
-	data := append(hb, bb...)
+	data := append(append(make([]byte, 0, len(hb)+len(bb)), hb[:]...), bb...)
 
-	log.Debugf("Encoded:\n%s", hex.Dump(data))
+	if log.IsLevelEnabled(log.DebugLevel) {
+		log.Debugf("Encoded:\n%s", hex.Dump(data))
+	}
 
 	return data, nil
 }

@@ -237,7 +237,9 @@ func (sx *SerialXport) Stop() error {
 }
 
 func (sx *SerialXport) txRaw(bytes []byte) error {
-	log.Debugf("Tx serial\n%s", hex.Dump(bytes))
+	if log.IsLevelEnabled(log.DebugLevel) {
+		log.Debugf("Tx serial\n%s", hex.Dump(bytes))
+	}
 
 	_, err := sx.port.Write(bytes)
 	if err != nil {
@@ -248,7 +250,9 @@ func (sx *SerialXport) txRaw(bytes []byte) error {
 }
 
 func (sx *SerialXport) Tx(bytes []byte) error {
-	log.Debugf("Base64 encoding request:\n%s", hex.Dump(bytes))
+	if log.IsLevelEnabled(log.DebugLevel) {
+		log.Debugf("Base64 encoding request:\n%s", hex.Dump(bytes))
+	}
 
 	pktData := make([]byte, 2)
 
@@ -311,7 +315,11 @@ func (sx *SerialXport) Rx() ([]byte, error) {
 				break
 			}
 		}
-		log.Debugf("Rx serial:\n%s", hex.Dump(line))
+
+		if log.IsLevelEnabled(log.DebugLevel) {
+			log.Debugf("Rx serial:\n%s", hex.Dump(line))
+		}
+
 		if len(line) < 2 || ((line[0] != 4 || line[1] != 20) &&
 			(line[0] != 6 || line[1] != 9)) {
 			continue
@@ -356,7 +364,10 @@ func (sx *SerialXport) Rx() ([]byte, error) {
 			b := sx.pkt.GetBytes()
 			sx.pkt = nil
 
-			log.Debugf("Decoded input:\n%s", hex.Dump(b))
+			if log.IsLevelEnabled(log.DebugLevel) {
+				log.Debugf("Decoded input:\n%s", hex.Dump(b))
+			}
+
 			return b, nil
 		}
 	}
