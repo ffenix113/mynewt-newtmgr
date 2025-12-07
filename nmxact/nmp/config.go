@@ -55,10 +55,10 @@ func (r *ConfigReadRsp) Msg() *NmpMsg { return MsgFromReq(r) }
 //////////////////////////////////////////////////////////////////////////////
 
 type ConfigWriteReq struct {
-	NmpBase     `codec:"-"`
-	Name string `codec:"name,omitempty"`
-	Val  string `codec:"val,omitempty"`
-	Save bool   `codec:"save,omitempty"`
+	NmpBase `codec:"-"`
+	Name    string `codec:"name,omitempty"`
+	Val     []byte `codec:"val,omitempty"`
+	Save    bool   `codec:"save,omitempty"`
 }
 
 type ConfigWriteRsp struct {

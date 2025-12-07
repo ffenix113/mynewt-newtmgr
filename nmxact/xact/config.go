@@ -98,7 +98,7 @@ func (r *ConfigWriteResult) Status() int {
 func (c *ConfigWriteCmd) Run(s sesn.Sesn) (Result, error) {
 	r := nmp.NewConfigWriteReq()
 	r.Name = c.Name
-	r.Val = c.Val
+	r.Val = []byte(c.Val)
 	r.Save = c.Save
 
 	rsp, err := txReq(s, r.Msg(), &c.CmdBase)
