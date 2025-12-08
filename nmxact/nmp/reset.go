@@ -19,10 +19,9 @@
 
 package nmp
 
-import ()
-
 type ResetReq struct {
 	NmpBase `codec:"-"`
+	Force   bool `codec:"force,omitempty"`
 }
 
 type ResetRsp struct {

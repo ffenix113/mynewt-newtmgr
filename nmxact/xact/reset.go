@@ -27,6 +27,7 @@ import (
 type ResetCmd struct {
 	CmdBase
 	Payload string
+	Force   bool
 }
 
 func NewResetCmd() *ResetCmd {
@@ -49,6 +50,8 @@ func (r *ResetResult) Status() int {
 
 func (c *ResetCmd) Run(s sesn.Sesn) (Result, error) {
 	r := nmp.NewResetReq()
+
+	r.Force = c.Force
 
 	rsp, err := txReq(s, r.Msg(), &c.CmdBase)
 	if err != nil {

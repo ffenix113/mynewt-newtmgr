@@ -29,6 +29,8 @@ import (
 	"mynewt.apache.org/newtmgr/nmxact/xact"
 )
 
+var forceReset bool
+
 func resetRunCmd(cmd *cobra.Command, args []string) {
 	s, err := GetSesn()
 	if err != nil {
@@ -37,6 +39,8 @@ func resetRunCmd(cmd *cobra.Command, args []string) {
 
 	c := xact.NewResetCmd()
 	c.SetTxOptions(nmutil.TxOptions())
+
+	c.Force = forceReset
 
 	if _, err := c.Run(s); err != nil {
 		nmUsage(nil, util.ChildNewtError(err))
@@ -47,10 +51,12 @@ func resetRunCmd(cmd *cobra.Command, args []string) {
 
 func resetCmd() *cobra.Command {
 	resetCmd := &cobra.Command{
-		Use:   "reset -c <conn_profile>",
+		Use:   "reset [--force] -c <conn_profile>",
 		Short: "Perform a soft reset of a device",
 		Run:   resetRunCmd,
 	}
+
+	resetCmd.PersistentFlags().BoolVarP(&forceReset, "force", "f", false, "Force device reset")
 
 	return resetCmd
 }
